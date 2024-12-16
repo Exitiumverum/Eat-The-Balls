@@ -26,29 +26,40 @@ var msBallGenrationTime = 5000
 //booleans
 var gIsGamerStuck = false
 var gIsGameRunning = true
+let isGamePlayingInterval
+let isGameRunning = true
 
 function initGame() {
+	// gBallBoardCount = 0
+	isGameRunning = true
+	initScore()
 
-		gGamerPos = { i: 2, j: 9 }
-		gBoard = buildBoard()
-		renderBoard(gBoard)
-		setInterval(countNeighborBall, 30)
-		setInterval(isGamePlaying, 30)
-		setInterval(createGlueCandies, 5000)
-	
+	gGamerPos = { i: 2, j: 9 }
+	gBoard = buildBoard()
+	renderBoard(gBoard)
+
+
+	isGamePlayingInterval = setInterval(isGamePlaying, 30) // Store the interval ID
+
+	setInterval(countNeighborBall, 30)
+	setInterval(createGlueCandies, 5000)
+
 }
 
+
+
 function isGamePlaying() {
-	if (gBallBoardCount === 0) {
-		gIsGameRunning = false
-	}
+	console.log('Current Ball Count:', gBallBoardCount); // Log the current ball count
+    if (gBallBoardCount === 0) {
+        gIsGameRunning = false;
+        gameOver(); // Call game over function
+        return;
+    }
 
-
-	console.log(gBallBoardCount)
-	if (!gIsGameRunning) {
-		gameOver()
-		return
-	}
+    if (!gIsGameRunning) {
+        gameOver(); // Call game over function
+        return;
+    }
 }
 
 function buildBoard() {
@@ -91,13 +102,14 @@ function randomBalls(board) {
 
 	board[iIndex][jIndex].gameElement = BALL
 	renderCell({ i: iIndex, j: jIndex })
-	renderBoard(board)
+	renderBoard(gBoard)
 	gBallBoardCount++
 
 }
 
 // Render the board to an HTML table
 function renderBoard(board) {
+
 
 	const elBoard = document.querySelector('.board')
 	var strHTML = ''
@@ -158,7 +170,8 @@ function moveTo(i, j) {
 		if (toCell.gameElement === BALL) {
 			console.log('Collecting!')
 			scoreCount()
-			gBallBoardCount--
+			gBallBoardCount -= 1
+			console.log(gBallBoardCount)
 		}
 
 		if (toCell.type === WORMHOLE) {
@@ -255,6 +268,14 @@ function getRandomInt(min, max) {
 	return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled)
 }
 
+function initScore() {
+	gScoreCount = 0
+	let score = document.querySelector('.info .score-count')
+	// console.log(score)
+	score.innerText = `score: ${gScoreCount}`
+
+}
+
 function scoreCount() {
 	gScoreCount++
 	let score = document.querySelector('.info .score-count')
@@ -266,8 +287,8 @@ function countNeighborBall() {
 	let ngBalls = document.querySelector('.info .neighbor-ball')
 	gBallNgCount = 0
 
-	for (let i = gGamerPos.i - 1; i <= gGamerPos.i + 1; i++) {
-		for (let j = gGamerPos.j - 1; j <= gGamerPos.j + 1; j++) {
+	for (var i = gGamerPos.i - 1; i <= gGamerPos.i + 1; i++) {
+		for (var j = gGamerPos.j - 1; j <= gGamerPos.j + 1; j++) {
 			if (gBoard[i][j].gameElement === WORMHOLE) continue
 
 			if (gBoard[i][j].gameElement === GAMER) continue
@@ -301,6 +322,7 @@ function createGlueCandies() {
 }
 
 function gameOver() {
+	clearInterval()
 	let button = document.querySelector('.restart')
 
 	button.innerHTML = `<button class="restart-btn" onclick="resartGame()"> restart</button>`
@@ -308,7 +330,7 @@ function gameOver() {
 
 function resartGame() {
 	gIsGameRunning = true
-	document.querySelector('.restart').innerHTML = ''
+	document.querySelector('.restart .btn-restart').innerHTML = ''
 	initGame()
 }
 
