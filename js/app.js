@@ -21,7 +21,7 @@ var gGamerPos
 var gScoreCount = 0
 var gBallNgCount = 0
 var gBallBoardCount = 0
-var msBallGenrationTime = 5000
+var msBallGenrationTime = 1000
 
 //booleans
 var gIsGamerStuck = false
